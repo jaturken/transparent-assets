@@ -24,7 +24,7 @@ class << ActiveRecord::Base
     raise TransparentAssets::InvalidOptionsError.new "TransparentAssets options should be a hash" unless options.is_a? Hash
     options.each do |k, v|
       unless [:observerable_columns].include? k
-        raise TransparentAssets::TransparentAssetsException.new "Unknown option #{k} for TransparentAssets"
+        raise TransparentAssets::UnknownOptionError.new "Unknown option #{k} for TransparentAssets"
       end
     end
 
@@ -45,5 +45,8 @@ end
 
 module TransparentAssets
   class InvalidOptionsError < ArgumentError
+  end
+
+  class UnknownOptionError < ArgumentError
   end
 end
