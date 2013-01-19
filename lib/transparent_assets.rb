@@ -21,7 +21,7 @@ end
 class << ActiveRecord::Base
 
   def has_transparent_assets options = {}
-    raise TransparentAssets::TransparentAssetsException.new "TransparentAssets options should be a hash" unless options.is_a? Hash
+    raise TransparentAssets::InvalidOptionsError.new "TransparentAssets options should be a hash" unless options.is_a? Hash
     options.each do |k, v|
       unless [:observerable_columns].include? k
         raise TransparentAssets::TransparentAssetsException.new "Unknown option #{k} for TransparentAssets"
@@ -44,6 +44,6 @@ class << ActiveRecord::Base
 end
 
 module TransparentAssets
-  class TransparentAssetsException < RuntimeError
+  class InvalidOptionsError < ArgumentError
   end
 end
