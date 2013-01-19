@@ -1,5 +1,6 @@
 module TransparentAssets
   class InstallGenerator < Rails::Generators::Base
+    desc "This generator creates initializer and config files for transparent_assets gem"
     def create_initializer
       initializer_text = "# Add initialization content here"
       create_file "config/initializers/transparent_assets.rb", initializer_text
