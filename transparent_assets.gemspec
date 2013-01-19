@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.name        = 'transparent_assets'
+  s.name        = 'transparent-assets'
   s.version     = '0.0.0'
   s.date        = '2013-01-19'
   s.summary     = "Transparent assets"
