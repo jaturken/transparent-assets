@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'transparent-assets'
-  s.version     = '0.0.0'
+  s.version     = '0.0.1'
   s.date        = '2013-01-19'
   s.summary     = "Transparent assets"
   s.description = "A gem that allows to store assets on any remote storage"

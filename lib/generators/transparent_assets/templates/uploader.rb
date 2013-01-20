@@ -7,7 +7,7 @@ class TransparentAssetUploader < CarrierWave::Uploader::Base
     config.storage = TransparentAssets.config[:storage]
     config.fog_credentials = TransparentAssets.config[:fog_credentials].symbolize_keys
     config.fog_directory = 'transparent-assets'
-    #config.asset_host = TransparentAssets.config[:fog_host]
+    config.asset_host = TransparentAssets.config[:fog_host]
   end
 
   # Include RMagick or MiniMagick support:
@@ -23,7 +23,7 @@ class TransparentAssetUploader < CarrierWave::Uploader::Base
   # Override the filename of the uploaded files:
   # Avoid using model.id or version_name here, see uploader/store.rb for details.
   def filename
-    [TransparentAssets.generate_uuid.to_str,file.extension].join('.') if original_filename
+    [Digest::SHA1.hexdigest(file.read),file.extension].join('.') if original_filename
   end
 
 end

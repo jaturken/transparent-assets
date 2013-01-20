@@ -1,6 +1,4 @@
-require "uuid"
 require 'yaml'
-require 'digest/sha1'
 require 'carrierwave'
 require 'uri'
 require 'pathname'
@@ -51,11 +49,11 @@ module TransparentAssets
         filename = file.original_filename
         file = file.tempfile
       when String
-        filename = "geturlpart"
+        return file #TODO
     end
 
     if file.is_a? String
-
+      #TODO
     else
       hsh = Digest::SHA1.hexdigest(file.read)
       static = StaticFile.find_or_initialize_by_checksum(hsh).tap do |record|
@@ -68,14 +66,9 @@ module TransparentAssets
 
   end
 
-  def generate_uuid
-    uuid = UUID.new
-    uuid.generate
-  end
-
   def convert_absolute_urls_to_uids(string)
     URI.extract(string).map do |absolute_url|
-      if absolute_url.match(self.config[:fog_host])
+      if absolute_url.match(TransparentAssets.config[:fog_host])
         file = Pathname.new(absolute_url)
         uid = file.basename.sub(file.extname, '').to_s
         string.gsub!(absolute_url, uid)
@@ -88,8 +81,8 @@ module TransparentAssets
   def uids_to_absolute_urls(string)
     uids = string.scan(/[src] *= *[\"\']{0,1}([^\"\'\ >]*)/).map(&:first)
     uids.map do |uid|
-      absolute_url = StaticFile.find_by_checksum(partitioned_string[1]).file.url
-      string.gsub!(uid, absolute_url)
+      record = StaticFile.find_by_checksum(uid)
+      string.gsub!(uid, record.file.url) if record.present?
     end
     string
   end
