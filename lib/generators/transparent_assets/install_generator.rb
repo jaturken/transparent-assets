@@ -16,5 +16,9 @@ module TransparentAssets
       timestamp = Time.now.strftime("%Y%m%d%I%M%S")
       template "create_static_files.rb", "db/migrate/#{timestamp}_create_static_files.rb"
     end
+
+    def add_uploader
+      template "uploader.rb", 'app/uploaders/transparent_asset_uploader'
+    end
   end
 end
