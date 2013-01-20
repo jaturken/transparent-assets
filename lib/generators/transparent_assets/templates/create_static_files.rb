@@ -1,4 +1,4 @@
-class CreateUuids < ActiveRecord::Migration
+class CreateStaticFiles < ActiveRecord::Migration
   def self.up
     create_table(:static_filess, :id => false) do |t|
       t.string :file, :primary => true
