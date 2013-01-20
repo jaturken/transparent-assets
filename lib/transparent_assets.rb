@@ -2,6 +2,8 @@ require "uuid"
 require 'yaml'
 require 'digest/sha1'
 require 'carrierwave'
+require 'uri'
+require 'pathname'
 
 
 module TransparentAssets
@@ -54,12 +56,24 @@ module TransparentAssets
     uuid.generate
   end
 
-  def cloud_to_uids(string)
-    string+'encoded'
+  def global_urls_to_uids(string)
+    local_urls = URI.extract(string)
+    local_urls.map do |local_url|
+      uid = Pathname.new(local_url).basename.to_s.sub(/.jp(|e)g/, '')
+      partitioned_string = string.rpartition(local_url)
+      string = partitioned_string.first + "'#{uid}'" + partitioned_string.first
+    end
+    string
   end
 
-  def uids_to_cloud(string)
-    'decoded'
+  def uids_to_global_urls(string)
+    uids = string.scan(/[src] *= *[\"\']{0,1}([^\"\'\ >]*)/).map(&:first)
+    uids.map do |uid|
+      partitioned_string = string.rpartition(uid)
+      global_url = StaticFile.find_by_checksum(partitioned_string[1]).file.url
+      string = partitioned_string.first + global_url + partitioned_string.last
+    end
+    string
   end
 
 end
@@ -81,8 +95,8 @@ class << ActiveRecord::Base
     include TransparentAssets
 
     self.observerable_columns.each do |column|
-      define_method(column){  uids_to_cloud(send(:read_attribute, column))  }
-      define_method("#{column}=") { |value| send(:write_attribute, column, cloud_to_uids(value)) }
+      define_method(column){  uids_to_global_urls(send(:read_attribute, column))  }
+      define_method("#{column}=") { |value| send(:write_attribute, column, global_urls_to_uids(value)) }
     end
 
 
