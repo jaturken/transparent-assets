@@ -1,6 +1,38 @@
 require "uuid"
+require 'yaml'
 
 module TransparentAssets
+
+  @options = {
+      :storage => :file,
+      :fog_credentials => {}
+  }
+
+  def self.configure(opts={})
+    opts.each{|k,v| @options[k.to_sym] = v if @options.keys.include? k.to_sym}
+  end
+
+  def self.generate_uuid
+    uuid = UUID.new
+    uuid.generate
+  end
+
+  def self.configure_with(path_to_yaml_file)
+    begin
+      config = YAML::load(IO.read(path_to_yaml_file))[Rails.env]
+    rescue Errno::ENOENT
+      log(:warning, "YAML configuration file couldn't be found. Using defaults."); return
+    rescue Psych::SyntaxError
+      log(:warning, "YAML configuration file contains invalid syntax. Using defaults."); return
+    end
+
+    configure(config)
+  end
+
+  def self.config
+    @options
+  end
+
 
   def generate_uuid
     uuid = UUID.new
