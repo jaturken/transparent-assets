@@ -37,7 +37,7 @@ module TransparentAssets
 
 
   def self.check(file)
-    if file.present? and is_a? File
+    if file.present? and file.is_a? File
       hsh = Digest::SHA1.hexdigest(file.read)
       statik = StaticFile.find_or_create_by_checsum(hsh).tap do |record|
         record.filename = file.basename
