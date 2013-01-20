@@ -18,7 +18,7 @@ module TransparentAssets
     end
 
     def add_uploader
-      template "uploader.rb", 'app/uploaders/transparent_asset_uploader'
+      template "uploader.rb", 'app/uploaders/transparent_asset_uploader.rb'
     end
   end
 end
