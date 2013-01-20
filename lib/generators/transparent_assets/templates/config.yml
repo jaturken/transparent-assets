@@ -2,5 +2,5 @@ development:
   storage: :fog
   fog_credentials:
     provider: 'AWS'
-    aws_access_key_id: '123'
-    aws_secret_access_key: 'sdaWzf32dcropcQz'
+    aws_access_key_id: 'YOUR-ACCESS-KEY'
+    aws_secret_access_key: 'YOUR-SECRET-ID'
