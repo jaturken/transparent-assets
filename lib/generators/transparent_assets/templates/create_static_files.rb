@@ -1,6 +1,6 @@
 class CreateStaticFiles < ActiveRecord::Migration
   def self.up
-    create_table(:static_files, :id => false) do |t|
+    create_table(:static_files) do |t|
       t.string :file, :primary => true
       t.string :filename
       t.string :checksum

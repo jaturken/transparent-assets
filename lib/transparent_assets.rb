@@ -1,6 +1,7 @@
 require "uuid"
 require 'yaml'
 require 'digest/sha1'
+require 'carrierwave'
 
 
 module TransparentAssets
@@ -39,11 +40,12 @@ module TransparentAssets
   def self.check(file)
     if file.present? and file.is_a? File
       hsh = Digest::SHA1.hexdigest(file.read)
-      statik = StaticFile.find_or_create_by_checsum(hsh).tap do |record|
-        record.filename = file.basename
+      static = StaticFile.find_or_initialize_by_checksum(hsh).tap do |record|
+        record.filename = File.basename file
         record.file = file
-      end.save
-      return statik.url
+      end
+      static.save if static.new_record?
+      return static.file.url
     end
   end
 

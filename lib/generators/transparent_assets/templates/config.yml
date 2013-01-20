@@ -4,3 +4,5 @@ development:
     provider: 'AWS'
     aws_access_key_id: 'YOUR-ACCESS-KEY'
     aws_secret_access_key: 'YOUR-SECRET-ID'
+  fog_directory: 'BUCKET-NAME'
+  fog_host: 'CLOUD-HOST'

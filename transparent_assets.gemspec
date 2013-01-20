@@ -8,6 +8,7 @@ Gem::Specification.new do |s|
   s.email       = 'jaturken@gmail.com'
   s.files       = ["lib/transparent_assets.rb"]
   s.homepage    = 'https://github.com/jaturken/transparent-assets'
+  s.add_dependency('uuid')
   s.add_dependency('carrierwave')
   s.add_dependency('fog')
 end
