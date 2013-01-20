@@ -11,8 +11,10 @@ module TransparentAssets
       template "config.yml", "config/transparent_assets.yml"
     end
 
-    def add_uuid_model
-      template  "uuid.rb", "app/models/uuid.rb"
+    def add_uuid
+      template  "static_file.rb", "app/models/static_file.rb"
+      timestamp = Time.now.strftime("%Y%m%d%I%M%S")
+      template "create_static_files.rb", "db/migrate/#{timestamp}_create_static_files.rb"
     end
   end
 end
