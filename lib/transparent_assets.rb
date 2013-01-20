@@ -1,5 +1,7 @@
 require "uuid"
 require 'yaml'
+require 'digest/sha1'
+
 
 module TransparentAssets
 
@@ -33,6 +35,17 @@ module TransparentAssets
     @options
   end
 
+
+  def self.check(file)
+    if file.present? and is_a? File
+      hsh = Digest::SHA1.hexdigest(file.read)
+      statik = StaticFile.find_or_create_by_checsum(hsh).tap do |record|
+        record.filename = file.basename
+        record.file = file
+      end.save
+      return statik.url
+    end
+  end
 
   def generate_uuid
     uuid = UUID.new
