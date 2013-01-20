@@ -12,9 +12,9 @@ module TransparentAssets
     end
 
     def add_uuid
-      template  "uuid.rb", "app/models/uuid.rb"
+      template  "static_file.rb", "app/models/static_file.rb"
       timestamp = Time.now.strftime("%Y%m%d%I%M%S")
-      template "create_uuids.rb", "db/migrate/#{timestamp}_create_uuids.rb"
+      template "create_static_files.rb", "db/migrate/#{timestamp}_create_static_files.rb"
     end
   end
 end
