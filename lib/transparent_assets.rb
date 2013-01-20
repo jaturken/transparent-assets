@@ -10,7 +10,9 @@ module TransparentAssets
 
   @options = {
       :storage => :file,
-      :fog_credentials => {}
+      :fog_credentials => {},
+      :fog_directory => '',
+      :fog_host => ''
   }
 
   def self.configure(opts={})
@@ -40,15 +42,30 @@ module TransparentAssets
 
 
   def self.check(file)
-    if file.present? and file.is_a? File
+    return nil unless file.present? and [File, String, ActionDispatch::Http::UploadedFile].include? file.class
+
+    case file.class
+      when File
+        filename = File.basename file
+      when ActionDispatch::Http::UploadedFile
+        filename = file.original_filename
+        file = file.tempfile
+      when String
+        filename = "geturlpart"
+    end
+
+    if file.is_a? String
+
+    else
       hsh = Digest::SHA1.hexdigest(file.read)
       static = StaticFile.find_or_initialize_by_checksum(hsh).tap do |record|
-        record.filename = File.basename file
+        record.filename = filename
         record.file = file
       end
       static.save if static.new_record?
       return static.file.url
     end
+
   end
 
   def generate_uuid
@@ -56,22 +73,23 @@ module TransparentAssets
     uuid.generate
   end
 
-  def global_urls_to_uids(string)
-    local_urls = URI.extract(string)
-    local_urls.map do |local_url|
-      uid = Pathname.new(local_url).basename.to_s.sub(/.jp(|e)g/, '')
-      partitioned_string = string.rpartition(local_url)
-      string = partitioned_string.first + "'#{uid}'" + partitioned_string.first
+  def convert_absolute_urls_to_uids(string)
+    URI.extract(string).map do |absolute_url|
+      if absolute_url.match(self.config[:fog_host])
+        file = Pathname.new(absolute_url)
+        uid = file.basename.sub(file.extname, '').to_s
+        string.gsub!(absolute_url, uid)
+      end
     end
     string
   end
 
-  def uids_to_global_urls(string)
+
+  def uids_to_absolute_urls(string)
     uids = string.scan(/[src] *= *[\"\']{0,1}([^\"\'\ >]*)/).map(&:first)
     uids.map do |uid|
-      partitioned_string = string.rpartition(uid)
-      global_url = StaticFile.find_by_checksum(partitioned_string[1]).file.url
-      string = partitioned_string.first + global_url + partitioned_string.last
+      absolute_url = StaticFile.find_by_checksum(partitioned_string[1]).file.url
+      string.gsub!(uid, absolute_url)
     end
     string
   end
@@ -95,8 +113,8 @@ class << ActiveRecord::Base
     include TransparentAssets
 
     self.observerable_columns.each do |column|
-      define_method(column){  uids_to_global_urls(send(:read_attribute, column))  }
-      define_method("#{column}=") { |value| send(:write_attribute, column, global_urls_to_uids(value)) }
+      define_method(column){  uids_to_absolute_urls(send(:read_attribute, column))  }
+      define_method("#{column}=") { |value| send(:write_attribute, column, convert_absolute_urls_to_uids(value)) }
     end
 
 
