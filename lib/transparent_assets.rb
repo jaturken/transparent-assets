@@ -56,9 +56,9 @@ module TransparentAssets
       #TODO
     else
       hsh = Digest::SHA1.hexdigest(file.read)
-      static = StaticFile.find_or_initialize_by_checksum(hsh).tap do |record|
+      static = StaticFile.find_or_create_by_checksum(hsh).tap do |record|
         record.filename = filename
-        record.file = file
+        record.file = file if record.new_record?
       end
       static.save if static.new_record?
       return static.file.url
