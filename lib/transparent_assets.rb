@@ -79,7 +79,7 @@ module TransparentAssets
 
 
   def uids_to_absolute_urls(string)
-    return "" if string.empty?
+    return "" if string.nil? || string.empty?
     uids = string.scan(/[src] *= *[\"\']{0,1}([^\"\'\ >]*)/).map(&:first)
     uids.map do |uid|
       record = StaticFile.find_by_checksum(uid)
